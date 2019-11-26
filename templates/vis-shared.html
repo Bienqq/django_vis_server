@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shared vis</title>
+    <script src="{% static "scripts/plotly-latest.min.js" %}"></script>
+    <script src="{% static "scripts/underscore-min.js" %}"></script>
+    <script src="{% static "scripts/math.min.js" %}"></script>
+</head>
+<body>
+
+<h1>Plot created at : {{ date_created }}</h1>
+<div id="plot">
+
+</div>
+<script>
+    const parser = math.parser();
+    parser.evaluate("{{ formula }}");
+    const x = _.range({{ start }}, {{ end }}, {{ step }});
+    const y = _.range({{ start }}, {{ end }}, {{ step }});
+    const z = [];
+
+    for (let xx of x) {
+        const temp = [];
+        for (let yy of y) {
+            const z = parser.evaluate(`f(${xx},${yy})`);
+            temp.push(z)
+        }
+        z.push(temp);
+    }
+
+
+    const data = [{
+        type: 'surface',
+        x: x,
+        y: y,
+        z: z,
+        marker: {
+            color: 'rgb(16, 32, 77)'
+        },
+    },
+    ];
+    const layout = {
+        title: '3D Chart',
+        width: '800',
+        height: '600',
+        autosize: true,
+    };
+    const config = {
+        showLink: false,
+        displayModeBar: true
+    };
+
+    Plotly.newPlot(plot, data, layout, config)
+</script>
+</body>
+</html>
