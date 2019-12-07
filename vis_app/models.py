@@ -1,10 +1,10 @@
 from djongo import models
-from django import forms
 
 
+# python manage.py migrate
 # python manage.py makemigrations vis_app
 # python manage.py migrate vis_app
-# python manage.py migrate
+
 
 class PlotObject(models.Model):
     formula = models.CharField(max_length=100)
@@ -14,21 +14,36 @@ class PlotObject(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def share_url(self):
-        return f'http://127.0.0.1:8000/vis-shared/{self.id}'
+        return f'http://127.0.0.1:8000/vis-shared-plot/{self.id}'
 
 
 class GraphConnection(models.Model):
-    connection_from = models.IntegerField()
-    connection_to = models.IntegerField()
+    connection_from = models.CharField(max_length=100)
+    connection_to = models.CharField(max_length=100)
 
+    def __repr__(self):
+        return f'{{connection_from:{self.connection_from}, connection_to:{self.connection_to}}}'
 
-class GraphConnectionFrom(forms.ModelForm):
     class Meta:
-        model = GraphConnection
-        fields = ('connection_from', 'connection_to')
+        abstract = True
+
+
+class GraphNode(models.Model):
+    node = models.CharField(max_length=100)
+
+    def __repr__(self):
+        return f'"{self.node}"'
+
+    class Meta:
+        abstract = True
 
 
 class GraphObject(models.Model):
-    connections = models.ArrayModelField(model_container=GraphConnection, model_form_class=GraphConnectionFrom)
+    connections = models.ArrayModelField(model_container=GraphConnection)
+    nodes = models.ArrayModelField(model_container=GraphNode)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def share_url(self):
+        return f'http://127.0.0.1:8000/vis-shared-graph/{self.id}'
 
 # Create your models here.

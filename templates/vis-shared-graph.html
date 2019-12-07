@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shared graph</title>
+    <script src="{% static "scripts/vis-network.min.js" %}"></script>
+
+    <style>
+        .center {
+            text-align: center;
+            width: 800px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+
+<h1 class="center">Graph created at : {{ date_created }}</h1>
+<div id="graph" class="center">
+
+
+</div>
+
+<script type="text/javascript">
+    function randomColor() {
+        return '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
+    }
+
+    let edges =
+    {{ connections }}.map(item => ({
+        to: item.connection_to,
+        from: item.connection_from
+    }));
+
+    let nodes =
+    {{ nodes|safe }}.map((label, idx) => ({id: idx + 1, label, color: randomColor()}));
+
+    const container = document.getElementById('graph');
+    const data = {
+        nodes: nodes,
+        edges: edges,
+    };
+
+    const graphOptions = {
+        layout: {
+            hierarchical: false
+        },
+        edges: {
+            color: "lightgray",
+            arrows: {
+                to: {
+                    enabled: false
+                },
+                from: {
+                    enabled: false
+                }
+            }
+        },
+        nodes: {
+            font: {
+                color: "ghostwhite"
+            }
+        },
+        height: "400px",
+        width: '800px',
+    };
+
+    const network = new vis.Network(container, data, graphOptions);
+
+</script>
+</body>
+</html>
